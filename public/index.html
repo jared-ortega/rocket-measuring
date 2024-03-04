@@ -7,7 +7,7 @@
     <title>Rocket measuring</title>
     <style>
          #sample {
-                background-color: red;
+                background-color: cyan;
                 width: 300px;
                 height: 300px;
             }
@@ -27,21 +27,21 @@
     
 </head>
 <body>
-    <div class="rocket">Vamos!</div>
+    <!-- <div class="rocket">Vamos!</div> -->
 
-    <h1>Communicating from an Arduino to Node.js</h1>
+    <h1>Communicating from an Arduino to Node.js : </h1>
 
-    <div id="sample"></div>
+    <div id="display"></div>
         
 
     <script>
         var socket = io();
-
-        socket.on('data', function(data) {
+        // rtweight = real time weight
+        socket.on('rtweight', function(rtweight) {
         
-        console.log(data);
+        console.log(rtweight);
         
-        document.getElementById('sample').style.opacity = data+"%"; 
+        document.getElementById('display').style.opacity = data+"%"; 
 
 });
     </script>
