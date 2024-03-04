@@ -31,11 +31,30 @@ parser.on('data', function(data){
     let arr = new Uint8Array(data);
     let ready = enc.decode(arr)
     console.log("Input: ", ready);
+    sendMsg(io, 'rtweight', ready);
     //io.emit("data", data);
 });
 /*********************************************** */
 //Socket.io
+io.on('connection', socket => {
+    console.log('Usuario conectado');
 
+    // Maneja el evento de mensaje
+    socket.on('rtweight', msg => {
+        console.log('Mensaje recibido: ' + msg);
+        // Emite el mensaje a todos los clientes conectados
+        io.emit('rtweight', msg);
+    });
+
+    // Maneja el evento de desconexión
+    socket.on('disconnect', () => {
+        console.log('Usuario desconectado');
+    });
+});
+
+const sendMsg = (io, event, mensaje) => { // Agregar 'event' como un parámetro adicional
+    io.emit(event, mensaje);
+};
 
 
 app.listen(PORT, () => {
