@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4" crossorigin="anonymous"></script>
-    <script src="/socket.io/socket.io.js"></script>
     <title>Rocket measuring</title>
     <style>
          #sample {
@@ -37,7 +36,7 @@
 
     <script>
         // Conectarse al servidor
-        const socket = io();
+        const socket = io("http://localhost:3000");
       
         // Manejar eventos recibidos del servidor
         socket.on('connect', () => {

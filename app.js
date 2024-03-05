@@ -14,6 +14,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io/client-dist'));
+//app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io/client-dist'));
 
 
 //new amazing serial connection
