@@ -1,60 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4" crossorigin="anonymous"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rocket measuring</title>
     <style>
-         #sample {
-                background-color: cyan;
-                width: 300px;
-                height: 300px;
-            }
+      #sample {
+        background-color: cyan;
+        width: 300px;
+        height: 300px;
+      }
 
-        body {
-            background-color: #f2f2f2; /* Gris claro */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .rocket {
-            font-size: 72px;
-        }
+      body {
+        background-color: #f2f2f2; /* Gris claro */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .rocket {
+        font-size: 72px;
+      }
     </style>
-    
-</head>
-<body>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
     <!-- <div class="rocket">Vamos!</div> -->
 
-    <h1>Communicating from an Arduino to Node.js : </h1>
+    <h1>Communicating from an Arduino to Node.js :</h1>
 
     <div id="display"></div>
-        
 
     <script>
-        // Conectarse al servidor
-        const socket = io("http://localhost:3000");
-      
-        // Manejar eventos recibidos del servidor
-        socket.on('connect', () => {
-          console.log('Conectado al servidor');
-        });
-      
-        socket.on('rtweight', (msg) => {
-          console.log('Mensaje recibido: ' + msg);
-          // Haz lo que necesites con el mensaje recibido
-        });
-      
-        socket.on('disconnect', () => {
-          console.log('Desconectado del servidor');
-        });
-      
-        // Ejemplo de enviar un mensaje al servidor
-        // socket.emit('nombre_del_evento', datos);
-      </script>
-      
-</body>
+      // Conectarse al servidor
+      const socket = io("http://localhost:3000");
+      console.log("check 1", socket.connected);
+      socket.on("connect", function () {
+        console.log("check 2", socket.connected);
+      });
+      // // Manejar eventos recibidos del servidor
+      // socket.on('connect', () => {
+      //   console.log('Conectado al servidor');
+      // });
+
+      // socket.on('rtweight', (msg) => {
+      //   console.log('Mensaje recibido: ' + msg);
+      //   // Haz lo que necesites con el mensaje recibido
+      // });
+
+      // socket.on('disconnect', () => {
+      //   console.log('Desconectado del servidor');
+      // });
+
+      // Ejemplo de enviar un mensaje al servidor
+      // socket.emit('nombre_del_evento', datos);
+    </script>
+  </body>
 </html>
