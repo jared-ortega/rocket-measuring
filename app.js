@@ -1,8 +1,9 @@
 const express = require("express");
 const http = require("http");
+const { SerialPort } = require("serialport");
 const socketIo = require("socket.io"); //socketio
 const app = express();
-const PORT = process.env.PORT || 3000;
+//const PORT = process.env.PORT || 3000;
 const path = require("path");
 // Set up server
 const server = http.createServer(app);
@@ -10,17 +11,15 @@ const io = socketIo(server);
 
 let rtw = 0;
 
+app.use(express.static(__dirname + '/public'));
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-app.use(
-  "/socket.io",
-  express.static(__dirname + "/node_modules/socket.io/client-dist")
-);
-//app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io/client-dist'));
+
+app.use("/socket.io", express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
 
 //new amazing serial connection
-const { SerialPort } = require("serialport");
 const { DelimiterParser } = require("@serialport/parser-delimiter");
 const port = new SerialPort({
   path: "COM3",
@@ -39,7 +38,8 @@ parser.on("data", function (data) {
   sendMsg(io, "rtweight", ready);
   //io.emit("data", data);
 });
-/*********************************************** */
+
+/************************************************/
 //Socket.io
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
@@ -51,7 +51,7 @@ io.on("connection", (socket) => {
     io.emit("rtweight", msg);
   });
 
-  // Maneja el evento de desconexión
+  // Evento de desconexión
   socket.on("disconnect", () => {
     console.log("Usuario desconectado");
   });
@@ -62,6 +62,7 @@ const sendMsg = (io, event, mensaje) => {
   io.emit(event, mensaje);
 };
 
-app.listen(PORT, () => {
-  console.log(`Running on ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
+})

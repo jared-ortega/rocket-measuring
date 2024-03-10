@@ -35,6 +35,7 @@
     <script>
       // Conectarse al servidor
       const socket = io("http://localhost:3000");
+      //
       console.log("check 1", socket.connected);
       socket.on("connect", function () {
         console.log("check 2", socket.connected);
@@ -44,10 +45,10 @@
       //   console.log('Conectado al servidor');
       // });
 
-      // socket.on('rtweight', (msg) => {
-      //   console.log('Mensaje recibido: ' + msg);
-      //   // Haz lo que necesites con el mensaje recibido
-      // });
+      socket.on('rtweight', (msg) => {
+        console.log('Mensaje recibido: ' + msg);
+        // Haz lo que necesites con el mensaje recibido
+      });
 
       // socket.on('disconnect', () => {
       //   console.log('Desconectado del servidor');
