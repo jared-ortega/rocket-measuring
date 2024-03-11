@@ -25,14 +25,8 @@
     </style>
     <script src="/socket.io/socket.io.js"></script>
   </head>
-  <body>
-    <!-- <div class="rocket">Vamos!</div> -->
-
-    <h1>Communicating from an Arduino to Node.js :</h1>
-
-    <div id="display"></div>
-
     <script>
+      let input;
       // Conectarse al servidor
       const socket = io("http://localhost:3000");
       //
@@ -47,6 +41,8 @@
 
       socket.on('rtweight', (msg) => {
         console.log('Mensaje recibido: ' + msg);
+        input = msg;
+        document.getElementById('display').innerText = "Mensaje recibido: " + msg;
         // Haz lo que necesites con el mensaje recibido
       });
 
@@ -57,5 +53,10 @@
       // Ejemplo de enviar un mensaje al servidor
       // socket.emit('nombre_del_evento', datos);
     </script>
+
+  <h1>Communicating from an Arduino to Node.js: </h1> 
+  </br>
+  <div id="display">.</div>
+
   </body>
 </html>

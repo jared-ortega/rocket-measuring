@@ -3,9 +3,8 @@ const http = require("http");
 const { SerialPort } = require("serialport");
 const socketIo = require("socket.io"); //socketio
 const app = express();
-//const PORT = process.env.PORT || 3000;
 const path = require("path");
-// Set up server
+
 const server = http.createServer(app);
 const io = socketIo(server);
 
@@ -36,7 +35,6 @@ parser.on("data", function (data) {
   let ready = enc.decode(arr);
   console.log("Input: ", ready);
   sendMsg(io, "rtweight", ready);
-  //io.emit("data", data);
 });
 
 /************************************************/
