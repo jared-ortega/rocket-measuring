@@ -26,38 +26,72 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
-    <script>
-      let input;
-      // Conectarse al servidor
-      const socket = io("http://localhost:3000");
-      //
-      console.log("check 1", socket.connected);
-      socket.on("connect", function () {
-        console.log("check 2", socket.connected);
-      });
-      // // Manejar eventos recibidos del servidor
-      // socket.on('connect', () => {
-      //   console.log('Conectado al servidor');
-      // });
-
-      socket.on('rtweight', (msg) => {
-        console.log('Mensaje recibido: ' + msg);
-        input = msg;
-        document.getElementById('display').innerText = "Mensaje recibido: " + msg;
-        // Haz lo que necesites con el mensaje recibido
-      });
-
-      // socket.on('disconnect', () => {
-      //   console.log('Desconectado del servidor');
-      // });
-
-      // Ejemplo de enviar un mensaje al servidor
-      // socket.emit('nombre_del_evento', datos);
-    </script>
+    
 
   <h1>Communicating from an Arduino to Node.js: </h1> 
   </br>
   <div id="display">.</div>
+  <canvas id="realtime-chart"></canvas>
 
+  <script>
+    let input;
+    // Conectarse al servidor
+    const socket = io("http://localhost:3000");
+    //
+    // console.log("check 1", socket.connected);
+    // socket.on("connect", function () {
+    //   console.log("check 2", socket.connected);
+    // });
+    // // Manejar eventos recibidos del servidor
+    // socket.on('connect', () => {
+    //   console.log('Conectado al servidor');
+    // });
+     // Configurar el gráfico
+     const ctx = document.getElementById('realtime-chart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Datos en Tiempo Real',
+                    data: [],
+                    borderColor: 'blue',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+      // socket
+
+    socket.on('rtweight', (data) => {
+      console.log('Mensaje recibido: ' + data);
+      const time = new Date().toLocaleTimeString();
+      chart.data.labels.push(time); // Agregar etiqueta de tiempo
+      chart.data.datasets[0].data.push(data); // Agregar dato
+      const maxDataPoints = 100;
+      input = data;
+      document.getElementById('display').innerText = "Mensaje recibido: " + data;
+      // Haz lo que necesites con el mensaje recibido
+      if (chart.data.labels.length > maxDataPoints) {
+                chart.data.labels.shift(); // Eliminar el primer punto
+                chart.data.datasets[0].data.shift(); // Eliminar el primer dato
+            }
+            chart.update();
+    });
+
+    // socket.on('disconnect', () => {
+    //   console.log('Desconectado del servidor');
+    // });
+
+    // Ejemplo de enviar un mensaje al servidor
+    // socket.emit('nombre_del_evento', datos);
+  </script>
   </body>
 </html>
