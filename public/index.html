@@ -22,6 +22,15 @@
       .rocket {
         font-size: 72px;
       }
+      .btn {
+        @apply font-bold py-2 px-4 rounded;
+      }
+      .btn-blue {
+        @apply bg-blue-500 text-white;
+      }
+      .btn-blue:hover {
+        @apply bg-blue-700;
+  }
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -30,10 +39,31 @@
 <body>
   <div>
       <div class="flex flex-col">
-        <h1>Rocket engine testing tool.</h1>
-        <p>Measurement:</p>
-        <div style="width: 500px; height: 500px;">
+        <div class="text-left">
+          <h1 class="">Rocket engine testing tool.</h1>
+        </div>
+        <div class="text-left">
+          <h3>Measurement:</h3>
+        </div>
+        <div style="width: 800px; height: 400px;">
           <canvas id="realtime-chart"></canvas>
+        </div>
+        <div class="flex flex-row">
+          <div>
+            <button type="button" class="m-5 px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              Tare
+            </button>
+          </div>
+          <div>
+            <button type="button" class="mt-5 mr-5  px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">
+              Start measurement
+            </button>            
+          </div>
+          <div>
+            <button type="button" class="mt-5 mr-5  px-3 py-2 text-sm font-medium text-center text-white bg-purple-700 rounded-lg hover:bg-purple-800 focus:ring-4 focus:outline-none focus:ring-purple-300 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-800">
+              Clear chart
+            </button>            
+          </div>
         </div>
       </div>
   </div>
@@ -49,10 +79,10 @@
             data: {
                 labels: [],
                 datasets: [{
-                    label: 'Datos en Tiempo Real',
+                    label: 'Real time data',
                     data: [],
-                    borderColor: 'blue',
-                    backgroundColor: 'transparent',
+                    borderColor: '#417eff',
+                    backgroundColor: '#417eff',
                     borderWidth: 2
                 }]
             },
