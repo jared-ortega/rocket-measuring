@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rocket measuring</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roceket Engine Testing</title>
     <style>
       #sample {
         background-color: cyan;
@@ -25,27 +25,23 @@
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-    
-
-  <h1>Communicating from an Arduino to Node.js: </h1> 
-  </br>
-  <div id="display">.</div>
-  <canvas id="realtime-chart"></canvas>
-
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div>
+      <div class="flex flex-col">
+        <h1>Rocket engine testing tool.</h1>
+        <p>Measurement:</p>
+        <div style="width: 500px; height: 500px;">
+          <canvas id="realtime-chart"></canvas>
+        </div>
+      </div>
+  </div>
   <script>
     let input;
     // Conectarse al servidor
     const socket = io("http://localhost:3000");
-    //
-    // console.log("check 1", socket.connected);
-    // socket.on("connect", function () {
-    //   console.log("check 2", socket.connected);
-    // });
-    // // Manejar eventos recibidos del servidor
-    // socket.on('connect', () => {
-    //   console.log('Conectado al servidor');
-    // });
+    
      // Configurar el gráfico
      const ctx = document.getElementById('realtime-chart').getContext('2d');
         const chart = new Chart(ctx, {
@@ -77,7 +73,7 @@
       chart.data.datasets[0].data.push(data); // Agregar dato
       const maxDataPoints = 100;
       input = data;
-      document.getElementById('display').innerText = "Mensaje recibido: " + data;
+      //document.getElementById('display').innerText = "Mensaje recibido: " + data;
       // Haz lo que necesites con el mensaje recibido
       if (chart.data.labels.length > maxDataPoints) {
                 chart.data.labels.shift(); // Eliminar el primer punto
@@ -93,5 +89,5 @@
     // Ejemplo de enviar un mensaje al servidor
     // socket.emit('nombre_del_evento', datos);
   </script>
-  </body>
+</body>
 </html>
