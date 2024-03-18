@@ -10,13 +10,18 @@ const io = socketIo(server);
 
 let rtw = 0;
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.use("/socket.io", express.static(path.join(__dirname, 'node_modules', 'socket.io', 'client-dist')));
+app.use(
+  "/socket.io",
+  express.static(
+    path.join(__dirname, "node_modules", "socket.io", "client-dist")
+  )
+);
 
 //new amazing serial connection
 const { DelimiterParser } = require("@serialport/parser-delimiter");
@@ -37,7 +42,6 @@ parser.on("data", function (data) {
   sendMsg(io, "rtweight", ready);
 });
 
-/************************************************/
 //Socket.io
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
@@ -62,5 +66,5 @@ const sendMsg = (io, event, mensaje) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
-})
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
+});
