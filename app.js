@@ -76,7 +76,23 @@ io.on("connection", (socket) => {
 
   // Mensaje desde el cliente:
   socket.on("serverInput", (msg)=>{
-    console.log("Mensaje desde el cliente: ", msg);
+    switch(msg){
+      case "tare":
+        console.log("Entra el funcion tara");
+        break;
+      case "start":
+        console.log("Entra en la funcion start");
+        break;
+      case "clear":
+        console.log("Entra en la funcion clear");
+        break;
+      case "save":
+        console.log("Entra en la funcion save");
+        break;
+      default:
+        console.log("Entra en default");
+    }
+
   })
 
   // Evento de desconexión

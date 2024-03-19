@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roceket Engine Testing</title>
+    <title>Rocket Engine Testing</title>
     <style>
       #sample {
         background-color: cyan;
@@ -61,6 +61,7 @@
             <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              onclick="sendServer('tare')"
             >
               Tare
             </button>
@@ -69,7 +70,7 @@
             <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              onclick="sendServer('test1button')"
+              onclick="sendServer('start')"
             >
               Start measurement
             </button>
@@ -78,6 +79,7 @@
             <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              onclick="sendServer('clear')"
             >
               Clear chart
             </button>
@@ -86,6 +88,7 @@
             <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              onclick="sendServer('save')"
             >
               Save
             </button>
