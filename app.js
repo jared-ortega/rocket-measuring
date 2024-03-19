@@ -8,7 +8,12 @@ const path = require("path");
 const server = http.createServer(app);
 const io = socketIo(server);
 
-let rtw = 0;
+let telemetry = {
+  timestamps: [],
+  measurements: [],
+};
+
+let tare = 0; //valor tara
 
 app.use(express.static(__dirname + "/public"));
 
@@ -22,6 +27,21 @@ app.use(
     path.join(__dirname, "node_modules", "socket.io", "client-dist")
   )
 );
+
+//update telemtry
+const updateTele = (measurement) => {
+  //tomo objeto y lo actualizo
+  const time = Date.now().toString();
+  telemetry.timestamps.push(time);
+  telemetry.measurements.push(time);
+};
+
+const clearTele = () => {
+  telemetry.timestamps = [];
+  telemetry.measurements = [];
+};
+
+
 
 //new amazing serial connection
 const { DelimiterParser } = require("@serialport/parser-delimiter");
@@ -40,18 +60,24 @@ parser.on("data", function (data) {
   let ready = enc.decode(arr);
   console.log("Input: ", ready);
   sendMsg(io, "rtweight", ready);
+
+
 });
 
 //Socket.io
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
-
   // Maneja el evento de mensaje
   socket.on("rtweight", (msg) => {
     console.log("Mensaje recibido: " + msg);
     // Emite el mensaje a todos los clientes conectados
     io.emit("rtweight", msg);
   });
+
+  // Mensaje desde el cliente:
+  socket.on("serverInput", (msg)=>{
+    console.log("Mensaje desde el cliente: ", msg);
+  })
 
   // Evento de desconexión
   socket.on("disconnect", () => {

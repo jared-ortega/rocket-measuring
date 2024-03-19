@@ -35,6 +35,14 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      //emitir al servidor
+      const sendServer = (msg) =>{
+        socket.emit('serverInput', msg);
+      }
+
+
+    </script>
   </head>
   <body>
     <div>
@@ -61,6 +69,7 @@
             <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              onclick="sendServer('test1button')"
             >
               Start measurement
             </button>
