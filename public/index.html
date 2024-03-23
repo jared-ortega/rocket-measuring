@@ -142,9 +142,9 @@
         chart.update();
       });
 
-      // socket.on('disconnect', () => {
-      //   console.log('Desconectado del servidor');
-      // });
+      socket.on('disconnect', () => {
+        console.log('Desconectado del servidor');
+      });
 
       // Ejemplo de enviar un mensaje al servidor
       // socket.emit('nombre_del_evento', datos);
