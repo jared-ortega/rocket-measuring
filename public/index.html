@@ -100,7 +100,7 @@
       const socket = io("http://localhost:3000");
 
       // Configurar el gráfico
-      const ctx = document.getElementById("realtime-chart").getContext("2d");
+     const ctx = document.getElementById("realtime-chart").getContext("2d");
       const chart = new Chart(ctx, {
         type: "line",
         data: {
@@ -123,6 +123,13 @@
           },
         },
       });
+
+      const clearChart = () => {
+        chart.data.labels = [];
+        chart.data.datasets[0].data = [];
+      }
+
+      
       // socket
       socket.on("rtweight", (data) => {
         console.log("Mensaje recibido: " + data);
@@ -142,7 +149,7 @@
 
       socket.on('disconnect', () => {
         console.log('Desconectado del servidor');
-      });
+      }); 
 
       // Ejemplo de enviar un mensaje al servidor
       // socket.emit('nombre_del_evento', datos);
