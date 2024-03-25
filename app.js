@@ -13,7 +13,7 @@ let telemetry = {
   measurements: [],
 };
 
-let tare = 0; //valor tara
+let calibrationValue = 0; //valor tara
 
 app.use(express.static(__dirname + "/public"));
 
