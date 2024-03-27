@@ -13,7 +13,9 @@ let telemetry = {
   measurements: [],
 };
 
-let calibrationValue = 0; //valor tara
+let calibrationValue = 0.0; //valor tara
+
+let dataArray = [];
 
 app.use(express.static(__dirname + "/public"));
 
@@ -33,13 +35,18 @@ const updateTele = (measurement) => {
   //tomo objeto y lo actualizo
   const time = Date.now().toString();
   telemetry.timestamps.push(time);
-  telemetry.measurements.push(time);
+  telemetry.measurements.push(measurement);
 };
 
 const clearTele = () => {
   telemetry.timestamps = [];
   telemetry.measurements = [];
 };
+
+const setTare = () => {
+  let lastValue = telemetry.measurements[telemetry.measurements.length -1];
+  calibrationValue = lastValue;
+}
 
 
 
@@ -58,9 +65,15 @@ parser.on("data", function (data) {
   let enc = new TextDecoder();
   let arr = new Uint8Array(data);
   let ready = enc.decode(arr);
-  console.log("Input: ", ready);
-  sendMsg(io, "rtweight", ready);
+  //console.log("Input: ", ready);
+  let value = ready.toString();
+  let valueN = parseFloat(value) - calibrationValue;
+  console.log("value: ", valueN);
 
+  //updateTelemetry array
+  updateTele(ready.toString());
+  sendMsg(io, "rtweight", ready);
+  console.log(telemetry);
 
 });
 
@@ -79,12 +92,14 @@ io.on("connection", (socket) => {
     switch(msg){
       case "tare":
         console.log("Entra el funcion tara");
+        setTare();
         break;
       case "start":
         console.log("Entra en la funcion start");
         break;
       case "clear":
         console.log("Entra en la funcion clear");
+        clearTele();
         break;
       case "save":
         console.log("Entra en la funcion save");
