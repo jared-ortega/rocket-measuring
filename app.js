@@ -17,6 +17,12 @@ let calibrationValue = 0.0; //valor tara
 
 let dataArray = [];
 
+//Este objeto guardara los resultados del test (tambien en un csv dentro del servidor)
+let telemetryResult ={
+  timestamps: [],
+  measurements: [],
+}
+
 app.use(express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
@@ -46,6 +52,18 @@ const clearTele = () => {
 const setTare = () => {
   let lastValue = telemetry.measurements[telemetry.measurements.length -1];
   calibrationValue = lastValue;
+}
+
+//start func
+const initTest = () => {
+  console.log("init test")
+  //  Clear array
+
+  //  delay
+
+  //  init pin relay
+
+  //
 }
 
 
