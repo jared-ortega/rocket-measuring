@@ -40,24 +40,9 @@
       const sendServer = (msg) =>{
         socket.emit('serverInput', msg);
       }
+
+
     </script>
-     <script>
-      function confirmStart() {
-          // Mostrar un mensaje de confirmación
-          if (confirm('¿Estás seguro de que quieres comenzar la medición?')) {
-              // Si el usuario hace clic en "Aceptar", ejecutar la función sendServer('start')
-              sendServer('start');
-          } else {
-              // Si el usuario hace clic en "Cancelar", no hacer nada
-          }
-      }
-  
-      function sendServer(command) {
-          // Esta es tu función sendServer, puedes mantenerla como está
-          console.log('Sending command to server:', command);
-          // Aquí puedes agregar la lógica para enviar el comando al servidor
-      }
-  </script>
   </head>
   <body>
     <div>
@@ -82,13 +67,14 @@
             </button>
           </div>
           <div>
-            <button
+            <!-- <button
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              onclick="confirmStart()"
               onclick="sendServer('start')"
             >
               Start measurement
-            </button>
+            </button> -->
           </div>
           <div>
             <button
@@ -100,9 +86,10 @@
             </button>
           </div><div>
             <button
+              id="startButton"
               type="button"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              onclick="confirmStart()"
+              
             >
               Start measurement
             </button>
@@ -121,6 +108,19 @@
       </div>
     </div>
     <script>
+
+      document.getElementById('startButton').addEventListener('click', ()=>{
+        let confirmStart = confirm('Confirm start?');
+
+        if(confirmStart){
+          sendServer('start')
+        }else{
+          return;
+        }
+
+      })
+
+
       let input;
       // Conectarse al servidor
       const socket = io("http://localhost:3000");
@@ -179,6 +179,11 @@
 
       // Ejemplo de enviar un mensaje al servidor
       // socket.emit('nombre_del_evento', datos);
+
+
+
+
+
     </script>
   </body>
 </html>
