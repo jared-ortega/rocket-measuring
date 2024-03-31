@@ -33,7 +33,6 @@
         socket.emit('serverInput', msg);
       }
 
-
     </script>
   </head>
   <body>
@@ -59,17 +58,10 @@
             </button>
           </div>
           <div>
-            <!-- <button
-              type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              onclick="confirmStart()"
-              onclick="sendServer('start')"
-            >
-              Start measurement
-            </button> -->
           </div>
           <div>
             <button
+              id="clearButton"
               type="clearButton"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
             >
@@ -118,7 +110,6 @@
         }
       });
 
-
       let input;
       // Conectarse al servidor
       const socket = io("http://localhost:3000");
@@ -153,7 +144,6 @@
         chart.data.datasets[0].data = [];
       }
 
-      
       // socket
       socket.on("rtweight", (data) => {
         console.log("Mensaje recibido: " + data);
@@ -162,7 +152,6 @@
         chart.data.datasets[0].data.push(data); // Agregar dato
         const maxDataPoints = 100;
         input = data;
-        //document.getElementById('display').innerText = "Mensaje recibido: " + data;
         // Haz lo que necesites con el mensaje recibido
         if (chart.data.labels.length > maxDataPoints) {
           chart.data.labels.shift(); // Eliminar el primer punto
@@ -174,12 +163,6 @@
       socket.on('disconnect', () => {
         console.log('Desconectado del servidor');
       }); 
-
-      // Ejemplo de enviar un mensaje al servidor
-      // socket.emit('nombre_del_evento', datos);
-
-
-
 
 
     </script>

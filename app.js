@@ -86,12 +86,12 @@ parser.on("data", function (data) {
   //console.log("Input: ", ready);
   let value = ready.toString();
   let valueN = parseFloat(value) - calibrationValue;
-  console.log("value: ", valueN);
+  //console.log("value: ", valueN);
 
   //updateTelemetry array
   updateTele(ready.toString());
   sendMsg(io, "rtweight", ready);
-  console.log(telemetry);
+  //console.log(telemetry);
 
 });
 
