@@ -92,6 +92,11 @@
     </div>
     <script>
 
+      const delChart = () => {
+        chart.data.labels = [];
+        chart.data.datasets[0].data = [];
+      }
+
       document.getElementById('startButton').addEventListener('click', ()=>{
         let confirmStart = confirm('Confirm start?');
         if(confirmStart){
@@ -102,9 +107,10 @@
       });
 
       document.getElementById('clearButton').addEventListener('click', ()=>{
-        let confirmStart = confirm('Confirm clear?');
-        if(confirmStart){
-          sendServer('clear')
+        let confirmClear = confirm('Confirm clear?');
+        if(confirmClear){
+          sendServer('clear');
+          delChart();
         }else{
           return;
         }
