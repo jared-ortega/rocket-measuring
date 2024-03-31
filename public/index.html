@@ -22,15 +22,7 @@
       .rocket {
         font-size: 72px;
       }
-      .btn {
-        @apply font-bold py-2 px-4 rounded;
-      }
-      .btn-blue {
-        @apply bg-blue-500 text-white;
-      }
-      .btn-blue:hover {
-        @apply bg-blue-700;
-      }
+      
     </style>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -78,9 +70,8 @@
           </div>
           <div>
             <button
-              type="button"
+              type="clearButton"
               class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              onclick="sendServer('clear')"
             >
               Clear chart
             </button>
@@ -111,14 +102,21 @@
 
       document.getElementById('startButton').addEventListener('click', ()=>{
         let confirmStart = confirm('Confirm start?');
-
         if(confirmStart){
           sendServer('start')
         }else{
           return;
         }
+      });
 
-      })
+      document.getElementById('clearButton').addEventListener('click', ()=>{
+        let confirmStart = confirm('Confirm clear?');
+        if(confirmStart){
+          sendServer('clear')
+        }else{
+          return;
+        }
+      });
 
 
       let input;
