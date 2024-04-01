@@ -1,4 +1,6 @@
+require('dotenv').config();
 const express = require("express");
+const fs = require('fs');
 const http = require("http");
 const { SerialPort } = require("serialport");
 const socketIo = require("socket.io"); //socketio
@@ -14,6 +16,8 @@ let telemetry = {
 };
 
 let calibrationValue = 0.0; //valor tara
+let recordData = false;
+let sendData = true;
 
 let dataArray = [];
 
@@ -40,8 +44,25 @@ app.use(
 const updateTele = (measurement) => {
   //tomo objeto y lo actualizo
   const time = Date.now().toString();
+  
   telemetry.timestamps.push(time);
   telemetry.measurements.push(measurement);
+  console.log("Telemetry obj:", telemetry);
+
+  //si esta recordData = true y el array 
+  //telemetry.timestamps.lenght = 3000 entonces
+  //guardo el array en un json y set recordData = false
+  if(recordData === true && telemetry.measurements.length >= process.env.DATA_SAMPLES){
+    console.log("entra en save data");
+    recordData = false;
+    const dataFile = JSON.stringify(telemetry);
+
+    const filePath = path.join(__dirname, '/measures',`file-data-${time}.json` )
+    fs.writeFileSync(filePath,dataFile);
+
+    clearTele();
+  }
+
 };
 
 const clearTele = () => {
@@ -56,22 +77,25 @@ const setTare = () => {
 
 //start func
 const initTest = () => {
-  console.log("init test")
-  //  Clear array
-
-  //  delay
-
-  //  init pin relay
-
-  //
+  recordData = true;
 }
+
+//Change sendData
+const setSendData = ()=> {
+  if(sendData){
+    sendData = false;
+  }else{
+    sendData = true;
+  }
+}
+
 
 
 
 //new amazing serial connection
 const { DelimiterParser } = require("@serialport/parser-delimiter");
 const port = new SerialPort({
-  path: "COM3",
+  path: process.env.SERIAL_PORT,
   baudRate: 9600,
 });
 //parser:
@@ -89,9 +113,12 @@ parser.on("data", function (data) {
   //console.log("value: ", valueN);
 
   //updateTelemetry array
-  updateTele(ready.toString());
-  sendMsg(io, "rtweight", ready);
-  //console.log(telemetry);
+  updateTele(valueN.toString());
+
+  //send data
+  if(sendData){
+    sendMsg(io, "rtweight", valueN);
+  }
 
 });
 
@@ -114,6 +141,7 @@ io.on("connection", (socket) => {
         break;
       case "start":
         console.log("Entra en la funcion start");
+        initTest();
         break;
       case "clear":
         console.log("Entra en la funcion clear");
@@ -121,6 +149,10 @@ io.on("connection", (socket) => {
         break;
       case "save":
         console.log("Entra en la funcion save");
+        break;
+      case "sendData":
+        console.log("Entra en la funcion setSendData");
+        setSendData();
         break;
       default:
         console.log("Entra en default");

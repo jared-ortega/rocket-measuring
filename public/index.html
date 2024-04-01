@@ -67,12 +67,21 @@
             >
               Clear chart
             </button>
-          </div><div>
+          </div>
+          <div>
+            <button
+              type="button"
+              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-md hover:bg-indigo-800"
+              onclick="sendServer('sendData')"
+            >
+              Stop
+            </button>
+          </div>
+          <div>
             <button
               id="startButton"
               type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              
+              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-amber-600 rounded-md hover:bg-amber-800"
             >
               Start measurement
             </button>
@@ -81,7 +90,7 @@
           <div>
             <button
               type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800 hidden"
               onclick="sendServer('save')"
             >
               Save
