@@ -109,7 +109,9 @@
       document.getElementById('startButton').addEventListener('click', ()=>{
         let confirmStart = confirm('Confirm start?');
         if(confirmStart){
+          delChart();
           sendServer('start')
+          
         }else{
           return;
         }

@@ -18,6 +18,7 @@ let telemetry = {
 let calibrationValue = 0.0; //valor tara
 let recordData = false;
 let sendData = true;
+let liftoff = false;
 
 let dataArray = [];
 
@@ -77,7 +78,10 @@ const setTare = () => {
 
 //start func
 const initTest = () => {
+  setTare();
+  clearTele();
   recordData = true;
+  liftoff = true;
 }
 
 //Change sendData
@@ -118,6 +122,16 @@ parser.on("data", function (data) {
   //send data
   if(sendData){
     sendMsg(io, "rtweight", valueN);
+  }
+
+
+  if(liftoff){
+    port.write('1', (err) => {
+      if(err){
+        return console.log('Error liftoff');
+      }
+      console.log('liftoff success!');
+    })
   }
 
 });
