@@ -1,6 +1,9 @@
 #include "HX711.h"
-const int DOUT=A1;
-const int CLK=A0;
+// const int DOUT=A1;
+// const int CLK=A0;
+
+const int DOUT = 3;
+const int CLK = 2;
 
 int percent = 0;
 int prevPercent = 0;
@@ -14,10 +17,13 @@ void setup() {
   // Serial.println("No ponga ningun  objeto sobre la balanza");
   // Serial.println("Destarando...");
   // Serial.println("...");
-  balanza.set_scale(-102.45652); // Establecemos la escala
-  balanza.tare(20);  //El peso actual es considerado Tara.
-  
-  //Serial.println("Listo para pesar");  
+  //balanza.set_scale(-103.65652);  // Establecemos la escala
+  //balanza.tare(20);               //El peso actual es considerado Tara.
+
+  balanza.set_scale(-105.1428);  
+  balanza.tare();               
+
+  //Serial.println("Listo para pesar");
 }
 
 void loop() {
@@ -28,10 +34,7 @@ void loop() {
   // }
   // delay(100);
   //Serial.print("Peso: ");
-  Serial.print(balanza.get_units(1),3);
+  Serial.print(balanza.get_units(1), 3);
   Serial.println();
-  delay(1000);
-
-
-  
+  delay(2500);
 }
