@@ -28,7 +28,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      //emitir al servidor
+      //emite al servidor
       const sendServer = (msg) =>{
         socket.emit('serverInput', msg);
       }
@@ -160,7 +160,7 @@
       });
 
       const clearChart = () => {
-        chart.data.labels = [];
+      chart.data.labels = [];
         chart.data.datasets[0].data = [];
       }
 
@@ -172,10 +172,9 @@
         chart.data.datasets[0].data.push(data); // Agregar dato
         const maxDataPoints = 100;
         input = data;
-        // Haz lo que necesites con el mensaje recibido
         if (chart.data.labels.length > maxDataPoints) {
-          chart.data.labels.shift(); // Eliminar el primer punto
-          chart.data.datasets[0].data.shift(); // Eliminar el primer dato
+          chart.data.labels.shift(); // Elimina el primer punto
+          chart.data.datasets[0].data.shift(); // Elimina el primer dato
         }
         chart.update();
       });
