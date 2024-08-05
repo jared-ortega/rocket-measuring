@@ -41,6 +41,29 @@ app.use(
     )
 );
 
+app.get("/json-files", (req, res) => {
+    const directoryPath = path.join(__dirname, "measures");
+
+    fs.readdir(directoryPath, (err, files) => {
+        if (err) {
+            return res.status(500).send("Unable to scan directory: " + err);
+        }
+
+        const jsonFiles = files.filter(
+            (file) => path.extname(file) === ".json"
+        );
+        const jsonData = [];
+
+        jsonFiles.forEach((file, index) => {
+            const filePath = path.join(directoryPath, file);
+            const data = fs.readFileSync(filePath, "utf8");
+            jsonData.push(JSON.parse(data));
+        });
+
+        res.json(jsonData);
+    });
+});
+
 //update telemtry
 const updateTele = (measurement) => {
     //tomo objeto y lo actualizo
