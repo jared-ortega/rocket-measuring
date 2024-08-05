@@ -16,6 +16,9 @@
             .rocket {
                 font-size: 72px;
             }
+            .hidden {
+                display: none;
+            }
         </style>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,7 +37,13 @@
                     <div style="width: 800px; height: 400px">
                         <canvas id="realtime-chart"></canvas>
                     </div>
-                    <div class="bg-sky-600"></div>
+                    <div
+                        style="width: 800px; height: 400px"
+                        class="hidden"
+                        id="saved-chart-container"
+                    >
+                        <canvas id="saved-chart"></canvas>
+                    </div>
                 </div>
                 <div class="flex flex-row">
                     <div>
@@ -51,6 +60,7 @@
                             id="clearButton"
                             type="button"
                             class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+                            onclick="clearChart()"
                         >
                             Clear chart
                         </button>
@@ -76,7 +86,7 @@
                     <div>
                         <button
                             type="button"
-                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800 hidden"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-md hover:bg-sky-800"
                             onclick="sendServer('save')"
                         >
                             Save
@@ -87,7 +97,7 @@
             <div class="m-8">
                 <div class="w-full p-4">
                     <h2 class="text-xl font-semibold text-gray-800">
-                        Lista de Archivos
+                        💾 Recorded files
                     </h2>
                     <ul id="file-list" class="mt-4"></ul>
                 </div>
@@ -109,6 +119,12 @@
                     .then((data) => {
                         const fileList = document.getElementById("file-list");
                         fileList.innerHTML = "";
+
+                        const jsonDataMap = {};
+                        data.forEach((item) => {
+                            jsonDataMap[item["file-name"]] = item;
+                        });
+
                         data.forEach((item) => {
                             const li = document.createElement("li");
                             li.className =
@@ -122,36 +138,19 @@
                             button.className =
                                 "p-2 text-blue-500 hover:underline";
                             button.textContent = "Show";
+                            //button actions
                             button.addEventListener("click", () => {
-                                fetch(`/json-files/${item["file-name"]}`)
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                        console.log(data);
-                                        clearChart();
-                                        data.forEach((item) => {
-                                            const time =
-                                                new Date().toLocaleTimeString();
-                                            chart.data.labels.push(time); // Agregar etiqueta de tiempo
-                                            chart.data.datasets[0].data.push(
-                                                item
-                                            ); // Agregar dato
-                                            const maxDataPoints = 100;
-                                            if (
-                                                chart.data.labels.length >
-                                                maxDataPoints
-                                            ) {
-                                                chart.data.labels.shift(); // Elimina el primer punto
-                                                chart.data.datasets[0].data.shift(); // Elimina el primer dato
-                                            }
-                                            chart.update();
-                                        });
-                                    })
-                                    .catch((error) => {
-                                        console.error(
-                                            "Error fetching JSON files:",
-                                            error
-                                        );
-                                    });
+                                const dataSaved =
+                                    jsonDataMap[item["file-name"]];
+                                if (dataSaved) {
+                                    console.log("data selected: ", dataSaved);
+                                    updateSavedChart(dataSaved);
+                                } else {
+                                    console.error(
+                                        "No data found for",
+                                        item["file-name"]
+                                    );
+                                }
                             });
 
                             li.appendChild(span);
@@ -222,6 +221,33 @@
                 },
             });
 
+            const savedChartCtx = document
+                .getElementById("saved-chart")
+                .getContext("2d");
+
+            const savedChart = new Chart(savedChartCtx, {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Saved data",
+                            data: [],
+                            borderColor: "##34A853",
+                            backgroundColor: "#34A853",
+                            borderWidth: 2,
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                        },
+                    },
+                },
+            });
+
             const clearChart = () => {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
@@ -230,7 +256,7 @@
             socket.on("rtweight", (data) => {
                 console.log("Mensaje recibido: " + data);
                 const time = new Date().toLocaleTimeString();
-                chart.data.labels.push(time); // Agregar etiqueta de tiempo
+                chart.data.labels.push(time);
                 chart.data.datasets[0].data.push(data); // Agregar dato
                 const maxDataPoints = 100;
                 input = data;
@@ -244,6 +270,26 @@
             socket.on("disconnect", () => {
                 console.log("Desconectado del servidor");
             });
+
+            const updateSavedChart = (dataSaved) => {
+                document
+                    .getElementById("realtime-chart")
+                    .parentElement.classList.add("hidden");
+                document
+                    .getElementById("saved-chart-container")
+                    .classList.remove("hidden");
+
+                savedChart.data.labels = dataSaved.timestamps.map((timestamp) =>
+                    new Date(parseInt(timestamp)).toLocaleTimeString()
+                );
+                savedChart.data.datasets[0].data = dataSaved.measurements.map(
+                    (measurement) => parseFloat(measurement)
+                );
+
+                savedChart.data.datasets[0].label = `Data from ${dataSaved["file-name"]}`;
+
+                savedChart.update();
+            };
         </script>
     </body>
 </html>
