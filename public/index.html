@@ -3,14 +3,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>🚀 📐 Rocket Engine Testing</title>
+        <title>🚀 Rocket Engine Testing</title>
         <style>
-            #sample {
-                background-color: cyan;
-                width: 300px;
-                height: 300px;
-            }
-
             body {
                 background-color: #f2f2f2;
                 display: flex;
@@ -26,18 +20,12 @@
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            //emite al servidor
-            const sendServer = (msg) => {
-                socket.emit("serverInput", msg);
-            };
-        </script>
     </head>
     <body>
         <div class="flex flex-row">
             <div class="flex flex-col">
                 <div class="text-left">
-                    <h1 class="">Rocket engine testing tool.</h1>
+                    <h1>Rocket engine testing tool.</h1>
                 </div>
                 <div class="text-left">
                     <p>Measurement:</p>
@@ -58,11 +46,10 @@
                             Tare
                         </button>
                     </div>
-                    <div></div>
                     <div>
                         <button
                             id="clearButton"
-                            type="clearButton"
+                            type="button"
                             class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
                         >
                             Clear chart
@@ -97,9 +84,86 @@
                     </div>
                 </div>
             </div>
-            <div>a</div>
+            <div class="m-8">
+                <div class="w-full p-4">
+                    <h2 class="text-xl font-semibold text-gray-800">
+                        Lista de Archivos
+                    </h2>
+                    <ul id="file-list" class="mt-4"></ul>
+                </div>
+                <div>
+                    <button
+                        type="button"
+                        class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+                        onclick="updateList()"
+                    >
+                        Update list
+                    </button>
+                </div>
+            </div>
         </div>
         <script>
+            const updateList = () => {
+                fetch("/json-files")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const fileList = document.getElementById("file-list");
+                        fileList.innerHTML = "";
+                        data.forEach((item) => {
+                            const li = document.createElement("li");
+                            li.className =
+                                "flex items-center justify-between p-2 bg-gray-100 rounded-lg mb-2";
+
+                            const span = document.createElement("span");
+                            span.className = "text-gray-700";
+                            span.textContent = item["file-name"];
+
+                            const button = document.createElement("button");
+                            button.className =
+                                "p-2 text-blue-500 hover:underline";
+                            button.textContent = "Show";
+                            button.addEventListener("click", () => {
+                                fetch(`/json-files/${item["file-name"]}`)
+                                    .then((response) => response.json())
+                                    .then((data) => {
+                                        console.log(data);
+                                        clearChart();
+                                        data.forEach((item) => {
+                                            const time =
+                                                new Date().toLocaleTimeString();
+                                            chart.data.labels.push(time); // Agregar etiqueta de tiempo
+                                            chart.data.datasets[0].data.push(
+                                                item
+                                            ); // Agregar dato
+                                            const maxDataPoints = 100;
+                                            if (
+                                                chart.data.labels.length >
+                                                maxDataPoints
+                                            ) {
+                                                chart.data.labels.shift(); // Elimina el primer punto
+                                                chart.data.datasets[0].data.shift(); // Elimina el primer dato
+                                            }
+                                            chart.update();
+                                        });
+                                    })
+                                    .catch((error) => {
+                                        console.error(
+                                            "Error fetching JSON files:",
+                                            error
+                                        );
+                                    });
+                            });
+
+                            li.appendChild(span);
+                            li.appendChild(button);
+                            fileList.appendChild(li);
+                        });
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching JSON files:", error);
+                    });
+            };
+
             const delChart = () => {
                 chart.data.labels = [];
                 chart.data.datasets[0].data = [];
@@ -130,10 +194,8 @@
                 });
 
             let input;
-            // Conectarse al servidor
             const socket = io("http://localhost:3000");
 
-            // Configurar el gráfico
             const ctx = document
                 .getElementById("realtime-chart")
                 .getContext("2d");
@@ -165,7 +227,6 @@
                 chart.data.datasets[0].data = [];
             };
 
-            // socket
             socket.on("rtweight", (data) => {
                 console.log("Mensaje recibido: " + data);
                 const time = new Date().toLocaleTimeString();

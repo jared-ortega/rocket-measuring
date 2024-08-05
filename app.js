@@ -57,14 +57,25 @@ app.get("/json-files", (req, res) => {
         jsonFiles.forEach((file, index) => {
             const filePath = path.join(directoryPath, file);
             const data = fs.readFileSync(filePath, "utf8");
-            jsonData.push(JSON.parse(data));
+            let parsedData;
+            try {
+                parsedData = JSON.parse(data);
+            } catch (e) {
+                console.error(`Error parsing JSON file ${file}:`, e);
+                return; // Skip invalid JSON file
+            }
+
+            if (parsedData.timestamps && parsedData.measurements) {
+                parsedData["file-name"] = file;
+                jsonData.push(parsedData);
+            }
         });
 
         res.json(jsonData);
     });
 });
 
-//update telemtry
+//update telemetry
 const updateTele = (measurement) => {
     //tomo objeto y lo actualizo
     const time = Date.now().toString();
