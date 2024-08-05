@@ -1,189 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rocket Engine Testing</title>
-    <style>
-      #sample {
-        background-color: cyan;
-        width: 300px;
-        height: 300px;
-      }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>🚀 📐 Rocket Engine Testing</title>
+        <style>
+            #sample {
+                background-color: cyan;
+                width: 300px;
+                height: 300px;
+            }
 
-      body {
-        background-color: #f2f2f2;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-      }
-      .rocket {
-        font-size: 72px;
-      }
-      
-    </style>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      //emite al servidor
-      const sendServer = (msg) =>{
-        socket.emit('serverInput', msg);
-      }
-
-    </script>
-  </head>
-  <body>
-    <div>
-      <div class="flex flex-col">
-        <div class="text-left">
-          <h1 class="">Rocket engine testing tool.</h1>
+            body {
+                background-color: #f2f2f2;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .rocket {
+                font-size: 72px;
+            }
+        </style>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            //emite al servidor
+            const sendServer = (msg) => {
+                socket.emit("serverInput", msg);
+            };
+        </script>
+    </head>
+    <body>
+        <div>
+            <div class="flex flex-col">
+                <div class="text-left">
+                    <h1 class="">Rocket engine testing tool.</h1>
+                </div>
+                <div class="text-left">
+                    <p>Measurement:</p>
+                </div>
+                <div class="flex flex-row">
+                    <div style="width: 800px; height: 400px">
+                        <canvas id="realtime-chart"></canvas>
+                    </div>
+                    <div class="bg-sky-600"></div>
+                </div>
+                <div class="flex flex-row">
+                    <div>
+                        <button
+                            type="button"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+                            onclick="sendServer('tare')"
+                        >
+                            Tare
+                        </button>
+                    </div>
+                    <div></div>
+                    <div>
+                        <button
+                            id="clearButton"
+                            type="clearButton"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+                        >
+                            Clear chart
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-md hover:bg-indigo-800"
+                            onclick="sendServer('sendData')"
+                        >
+                            Stop
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            id="startButton"
+                            type="button"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-amber-600 rounded-md hover:bg-amber-800"
+                        >
+                            Start measurement
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800 hidden"
+                            onclick="sendServer('save')"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="text-left">
-          <p>Measurement:</p>
-        </div>
-        <div  class="flex flex-row">
-          <div style="width: 800px; height: 400px">
-            <canvas id="realtime-chart"></canvas>
-          </div>
-          <div class="bg-sky-600"></div>
-        </div>
-        <div class="flex flex-row">
-          <div>
-            <button
-              type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-              onclick="sendServer('tare')"
-            >
-              Tare
-            </button>
-          </div>
-          <div>
-          </div>
-          <div>
-            <button
-              id="clearButton"
-              type="clearButton"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
-            >
-              Clear chart
-            </button>
-          </div>
-          <div>
-            <button
-              type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-md hover:bg-indigo-800"
-              onclick="sendServer('sendData')"
-            >
-              Stop
-            </button>
-          </div>
-          <div>
-            <button
-              id="startButton"
-              type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-amber-600 rounded-md hover:bg-amber-800"
-            >
-              Start measurement
-            </button>
-           
-          </div>
-          <div>
-            <button
-              type="button"
-              class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800 hidden"
-              onclick="sendServer('save')"
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
+        <script>
+            const delChart = () => {
+                chart.data.labels = [];
+                chart.data.datasets[0].data = [];
+            };
 
-      const delChart = () => {
-        chart.data.labels = [];
-        chart.data.datasets[0].data = [];
-      }
+            document
+                .getElementById("startButton")
+                .addEventListener("click", () => {
+                    let confirmStart = confirm("Confirm start?");
+                    if (confirmStart) {
+                        delChart();
+                        sendServer("start");
+                    } else {
+                        return;
+                    }
+                });
 
-      document.getElementById('startButton').addEventListener('click', ()=>{
-        let confirmStart = confirm('Confirm start?');
-        if(confirmStart){
-          delChart();
-          sendServer('start')
-          
-        }else{
-          return;
-        }
-      });
+            document
+                .getElementById("clearButton")
+                .addEventListener("click", () => {
+                    let confirmClear = confirm("Confirm clear?");
+                    if (confirmClear) {
+                        sendServer("clear");
+                        delChart();
+                    } else {
+                        return;
+                    }
+                });
 
-      document.getElementById('clearButton').addEventListener('click', ()=>{
-        let confirmClear = confirm('Confirm clear?');
-        if(confirmClear){
-          sendServer('clear');
-          delChart();
-        }else{
-          return;
-        }
-      });
+            let input;
+            // Conectarse al servidor
+            const socket = io("http://localhost:3000");
 
-      let input;
-      // Conectarse al servidor
-      const socket = io("http://localhost:3000");
+            // Configurar el gráfico
+            const ctx = document
+                .getElementById("realtime-chart")
+                .getContext("2d");
+            const chart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: "Real time data",
+                            data: [],
+                            borderColor: "#417eff",
+                            backgroundColor: "#417eff",
+                            borderWidth: 2,
+                        },
+                    ],
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                        },
+                    },
+                },
+            });
 
-      // Configurar el gráfico
-     const ctx = document.getElementById("realtime-chart").getContext("2d");
-      const chart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Real time data",
-              data: [],
-              borderColor: "#417eff",
-              backgroundColor: "#417eff",
-              borderWidth: 2,
-            },
-          ],
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
+            const clearChart = () => {
+                chart.data.labels = [];
+                chart.data.datasets[0].data = [];
+            };
 
-      const clearChart = () => {
-      chart.data.labels = [];
-        chart.data.datasets[0].data = [];
-      }
+            // socket
+            socket.on("rtweight", (data) => {
+                console.log("Mensaje recibido: " + data);
+                const time = new Date().toLocaleTimeString();
+                chart.data.labels.push(time); // Agregar etiqueta de tiempo
+                chart.data.datasets[0].data.push(data); // Agregar dato
+                const maxDataPoints = 100;
+                input = data;
+                if (chart.data.labels.length > maxDataPoints) {
+                    chart.data.labels.shift(); // Elimina el primer punto
+                    chart.data.datasets[0].data.shift(); // Elimina el primer dato
+                }
+                chart.update();
+            });
 
-      // socket
-      socket.on("rtweight", (data) => {
-        console.log("Mensaje recibido: " + data);
-        const time = new Date().toLocaleTimeString();
-        chart.data.labels.push(time); // Agregar etiqueta de tiempo
-        chart.data.datasets[0].data.push(data); // Agregar dato
-        const maxDataPoints = 100;
-        input = data;
-        if (chart.data.labels.length > maxDataPoints) {
-          chart.data.labels.shift(); // Elimina el primer punto
-          chart.data.datasets[0].data.shift(); // Elimina el primer dato
-        }
-        chart.update();
-      });
-
-      socket.on('disconnect', () => {
-        console.log('Desconectado del servidor');
-      }); 
-
-
-    </script>
-  </body>
+            socket.on("disconnect", () => {
+                console.log("Desconectado del servidor");
+            });
+        </script>
+    </body>
 </html>
