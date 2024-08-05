@@ -133,8 +133,25 @@ const setSendData = () => {
     }
 };
 
+//save all data
+const saveAllData = () => {
+    const time = Date.now().toString();
+    const dataFile = JSON.stringify(telemetry);
+
+    sendMsg(io, "saveData", dataFile);
+    const filePath = path.join(
+        __dirname,
+        "/measures",
+        `file-data-${time}.json`
+    );
+    fs.writeFileSync(filePath, dataFile);
+
+    //clearTele();
+};
+
 //new amazing serial connection
 const { DelimiterParser } = require("@serialport/parser-delimiter");
+const { send } = require("process");
 const port = new SerialPort({
     path: process.env.SERIAL_PORT,
     baudRate: 9600,
@@ -196,8 +213,9 @@ io.on("connection", (socket) => {
                 console.log("Entra en la funcion clear");
                 clearTele();
                 break;
-            case "save":
+            case "saveChart":
                 console.log("Entra en la funcion save");
+                saveAllData();
                 break;
             case "sendData":
                 console.log("Entra en la funcion setSendData");

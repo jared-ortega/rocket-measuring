@@ -87,7 +87,7 @@
                         <button
                             type="button"
                             class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-green-600 rounded-md hover:bg-sky-800"
-                            onclick="sendServer('save')"
+                            onclick="sendServer('saveChart')"
                         >
                             Save
                         </button>
@@ -113,6 +113,10 @@
             </div>
         </div>
         <script>
+            const sendServer = (action) => {
+                socket.emit("serverInput", action);
+            };
+
             const updateList = () => {
                 fetch("/json-files")
                     .then((response) => response.json())
@@ -289,6 +293,26 @@
                 savedChart.data.datasets[0].label = `Data from ${dataSaved["file-name"]}`;
 
                 savedChart.update();
+            };
+
+            socket.on("saveData", (data) => {
+                console.log("Data to save: " + data);
+                saveDataToJSON(data);
+            });
+
+            const saveDataToJSON = (recolectedData) => {
+                const jsonStr = JSON.stringify(recolectedData, null, 2);
+                const blob = new Blob([jsonStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = recolectedData.timestamps[timestamps.length - 1];
+
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(url);
             };
         </script>
     </body>
