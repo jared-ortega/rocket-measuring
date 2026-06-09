@@ -89,7 +89,7 @@ const updateTele = (measurement) => {
     //guardo el array en un json y set recordData = false
     if (
         recordData === true &&
-        telemetry.measurements.length >= process.env.DATA_SAMPLES
+        telemetry.measurements.length >= parseInt(process.env.DATA_SAMPLES)
     ) {
         console.log("entra en save data");
         recordData = false;

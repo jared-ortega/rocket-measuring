@@ -43,6 +43,13 @@
                         id="saved-chart-container"
                     >
                         <canvas id="saved-chart"></canvas>
+                        <button
+                            type="button"
+                            class="mt-2 px-3 py-2 text-sm font-medium text-center text-white bg-sky-600 rounded-md hover:bg-sky-800"
+                            onclick="showLiveChart()"
+                        >
+                            &larr; Live
+                        </button>
                     </div>
                 </div>
                 <div class="flex flex-row">
@@ -67,9 +74,10 @@
                     </div>
                     <div>
                         <button
+                            id="stopButton"
                             type="button"
                             class="mt-5 mr-5 px-3 py-2 text-sm font-medium text-center text-white bg-indigo-600 rounded-md hover:bg-indigo-800"
-                            onclick="sendServer('sendData')"
+                            onclick="toggleStream()"
                         >
                             Stop
                         </button>
@@ -142,7 +150,6 @@
                             button.className =
                                 "p-2 text-blue-500 hover:underline";
                             button.textContent = "Show";
-                            //button actions
                             button.addEventListener("click", () => {
                                 const dataSaved =
                                     jsonDataMap[item["file-name"]];
@@ -196,8 +203,36 @@
                     }
                 });
 
+            // punto 5: estado del streaming
+            let streamingActive = true;
+
+            const toggleStream = () => {
+                sendServer("sendData");
+                streamingActive = !streamingActive;
+                const btn = document.getElementById("stopButton");
+                if (streamingActive) {
+                    btn.textContent = "Stop";
+                    btn.classList.remove("bg-gray-500", "hover:bg-gray-700");
+                    btn.classList.add("bg-indigo-600", "hover:bg-indigo-800");
+                } else {
+                    btn.textContent = "Resume";
+                    btn.classList.remove("bg-indigo-600", "hover:bg-indigo-800");
+                    btn.classList.add("bg-gray-500", "hover:bg-gray-700");
+                }
+            };
+
+            // punto 4: volver al gráfico en vivo
+            const showLiveChart = () => {
+                document
+                    .getElementById("realtime-chart")
+                    .parentElement.classList.remove("hidden");
+                document
+                    .getElementById("saved-chart-container")
+                    .classList.add("hidden");
+            };
+
             let input;
-            const socket = io("http://localhost:3000");
+            const socket = io(); // punto 3: no hardcodear localhost
 
             const ctx = document
                 .getElementById("realtime-chart")
@@ -237,7 +272,7 @@
                         {
                             label: "Saved data",
                             data: [],
-                            borderColor: "##34A853",
+                            borderColor: "#34A853",
                             backgroundColor: "#34A853",
                             borderWidth: 2,
                         },
@@ -261,12 +296,12 @@
                 console.log("Mensaje recibido: " + data);
                 const time = new Date().toLocaleTimeString();
                 chart.data.labels.push(time);
-                chart.data.datasets[0].data.push(data); // Agregar dato
+                chart.data.datasets[0].data.push(data);
                 const maxDataPoints = 100;
                 input = data;
                 if (chart.data.labels.length > maxDataPoints) {
-                    chart.data.labels.shift(); // Elimina el primer punto
-                    chart.data.datasets[0].data.shift(); // Elimina el primer dato
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
                 }
                 chart.update();
             });
@@ -306,7 +341,8 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = recolectedData.timestamps[timestamps.length - 1];
+                // bug #1 fix: era timestamps.length, faltaba recolectedData
+                a.download = recolectedData.timestamps[recolectedData.timestamps.length - 1];
 
                 document.body.appendChild(a);
                 a.click();
@@ -314,6 +350,9 @@
 
                 URL.revokeObjectURL(url);
             };
+
+            // punto 7: cargar lista al abrir
+            updateList();
         </script>
     </body>
 </html>
