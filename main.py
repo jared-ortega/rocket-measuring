@@ -17,10 +17,12 @@ _UI_FONT = str(Path(__file__).parent / "DejaVuSansMono.ttf")
 CONFIG_PATH = "./config.json"
 _DEFAULTS = {
     "serial_port": "/dev/ttyUSB0",
-    "baud_rate": 9600,
+    "baud_rate": 115200,
     "data_samples": 3000,
-    "max_chart_points": 100,
+    "max_chart_points": 150,
+    "smoothing_window": 3,
     "db_path": "./measures.db",
+    "deadband": 0.01,
 }
 
 
@@ -58,9 +60,20 @@ state = {
     "live_y": [],
     "last_raw": 0.0,
     "pending_delete": None,
+    "last_chart_value": 0.0,
 }
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
+
+def _rolling_mean(values: list, window: int) -> list:
+    if window <= 1 or len(values) == 0:
+        return values
+    result = []
+    for i in range(len(values)):
+        start = max(0, i - window + 1)
+        result.append(sum(values[start : i + 1]) / (i - start + 1))
+    return result
 
 
 def _scan_ports() -> list[str]:
@@ -140,6 +153,7 @@ def _do_clear() -> None:
     state["live_x"] = []
     state["live_y"] = []
     state["chart_start"] = None
+    state["last_chart_value"] = 0.0
     dpg.set_value("live_series", [[], []])
     dpg.hide_item("dlg_clear")
 
@@ -160,6 +174,7 @@ def cb_start() -> None:
     state["live_x"] = []
     state["live_y"] = []
     state["chart_start"] = time.time()
+    state["last_chart_value"] = 0.0
     state["recording"] = True
     dpg.set_value("live_series", [[], []])
 
@@ -227,27 +242,32 @@ def _drain_queue() -> None:
         if not state["streaming"]:
             continue
 
-        value = raw - state["calibration"]
-        now = time.time()
-        if state["chart_start"] is None:
-            state["chart_start"] = now
-        ts = now - state["chart_start"]
+        value = max(0.0, (raw - state["calibration"]) * 0.00981)
+        dpg.set_value("txt_live_value", f"{value:.4f} N")
 
+        deadband = dpg.get_value("inp_deadband")
+        if abs(value - state["last_chart_value"]) < deadband:
+            continue
+        state["last_chart_value"] = value
+
+        if not state["recording"] or state["chart_start"] is None:
+            continue
+
+        ts = time.time() - state["chart_start"]
         state["live_x"].append(ts)
         state["live_y"].append(value)
 
         max_pts = config["max_chart_points"]
         x_win = state["live_x"][-max_pts:]
-        y_win = state["live_y"][-max_pts:]
+        y_win = _rolling_mean(state["live_y"][-max_pts:], config["smoothing_window"])
         dpg.set_value("live_series", [x_win, y_win])
         dpg.fit_axis_data("live_xax")
         dpg.fit_axis_data("live_yax")
 
-        if state["recording"]:
-            state["session_data"].append((ts, value))
-            if len(state["session_data"]) >= config["data_samples"]:
-                cb_save()
-                state["recording"] = False
+        state["session_data"].append((ts, value))
+        if len(state["session_data"]) >= config["data_samples"]:
+            cb_save()
+            state["recording"] = False
 
 
 # ── UI construction ───────────────────────────────────────────────────────────
@@ -277,14 +297,31 @@ def _build_ui() -> None:
             with dpg.plot(tag="live_plot", label="Live Data", width=620, height=400):
                 dpg.add_plot_legend()
                 dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="live_xax")
-                dpg.add_plot_axis(dpg.mvYAxis, label="Thrust", tag="live_yax")
-                dpg.add_line_series([], [], label="Thrust", tag="live_series", parent="live_yax")
+                dpg.add_plot_axis(dpg.mvYAxis, label="Thrust (N)", tag="live_yax")
+                dpg.add_line_series([], [], label="Thrust (N)", tag="live_series", parent="live_yax")
 
             with dpg.plot(tag="saved_plot", label="Saved Session", width=-1, height=400):
                 dpg.add_plot_legend()
                 dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="saved_xax")
-                dpg.add_plot_axis(dpg.mvYAxis, label="Thrust", tag="saved_yax")
+                dpg.add_plot_axis(dpg.mvYAxis, label="Thrust (N)", tag="saved_yax")
                 dpg.add_line_series([], [], label="", tag="saved_series", parent="saved_yax")
+
+        dpg.add_separator()
+
+        # ── Live value + Dead band ─────────────────────────────────────────────
+        with dpg.group(horizontal=True):
+            dpg.add_text("Live thrust:")
+            dpg.add_text("0.0000 N", tag="txt_live_value")
+            dpg.add_spacer(width=40)
+            dpg.add_text("Dead band (N):")
+            dpg.add_input_float(
+                tag="inp_deadband",
+                default_value=0.01,
+                min_value=0.0,
+                step=0.001,
+                format="%.4f",
+                width=130,
+            )
 
         dpg.add_separator()
 
