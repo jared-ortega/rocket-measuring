@@ -61,6 +61,7 @@ state = {
     "last_raw": 0.0,
     "pending_delete": None,
     "last_chart_value": 0.0,
+    "view_pts": [],       # full data of currently displayed saved session
 }
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -125,11 +126,65 @@ def _show_session(session_id: int, name: str) -> None:
     pts = db.load_measurements(session_id)
     xs = [p["ts"] for p in pts]
     ys = [p["value"] for p in pts]
+    state["view_pts"] = list(zip(xs, ys))
     dpg.set_value("saved_series", [xs, ys])
+    dpg.set_value("saved_scatter", [[], []])
+    dpg.configure_item("saved_scatter", show=False)
+    dpg.set_value("chk_show_points", False)
     if xs:
+        dpg.set_value("inp_view_from", xs[0])
+        dpg.set_value("inp_view_to", xs[-1])
         dpg.fit_axis_data("saved_xax")
         dpg.fit_axis_data("saved_yax")
     dpg.configure_item("saved_plot", label=f"Session: {name}")
+
+
+def _sync_scatter(xs: list, ys: list) -> None:
+    if dpg.get_value("chk_show_points"):
+        dpg.configure_item("saved_scatter", show=True)
+        dpg.set_value("saved_scatter", [xs, ys])
+
+
+def _apply_view_filter() -> None:
+    pts = state["view_pts"]
+    if not pts:
+        return
+    t_min = dpg.get_value("inp_view_from")
+    t_max = dpg.get_value("inp_view_to")
+    if t_min < t_max:
+        filtered = [(x, y) for x, y in pts if t_min <= x <= t_max]
+    else:
+        filtered = pts
+    xs = [p[0] for p in filtered]
+    ys = [p[1] for p in filtered]
+    dpg.set_value("saved_series", [xs, ys])
+    _sync_scatter(xs, ys)
+    if xs:
+        dpg.fit_axis_data("saved_xax")
+        dpg.fit_axis_data("saved_yax")
+
+
+def _reset_view_filter() -> None:
+    pts = state["view_pts"]
+    if not pts:
+        return
+    xs = [p[0] for p in pts]
+    ys = [p[1] for p in pts]
+    dpg.set_value("inp_view_from", xs[0])
+    dpg.set_value("inp_view_to", xs[-1])
+    dpg.set_value("saved_series", [xs, ys])
+    _sync_scatter(xs, ys)
+    dpg.fit_axis_data("saved_xax")
+    dpg.fit_axis_data("saved_yax")
+
+
+def cb_toggle_points(_, app_data) -> None:
+    if app_data:
+        xs, ys = dpg.get_value("saved_series")
+        dpg.configure_item("saved_scatter", show=True)
+        dpg.set_value("saved_scatter", [xs, ys])
+    else:
+        dpg.configure_item("saved_scatter", show=False)
 
 
 def _confirm_delete(session_id: int) -> None:
@@ -245,7 +300,7 @@ def _drain_queue() -> None:
         value = max(0.0, (raw - state["calibration"]) * 0.00981)
         dpg.set_value("txt_live_value", f"{value:.4f} N")
 
-        deadband = dpg.get_value("inp_deadband")
+        deadband = 0.0 if value >= 1.0 else dpg.get_value("inp_deadband")
         if abs(value - state["last_chart_value"]) < deadband:
             continue
         state["last_chart_value"] = value
@@ -305,6 +360,36 @@ def _build_ui() -> None:
                 dpg.add_plot_axis(dpg.mvXAxis, label="Time (s)", tag="saved_xax")
                 dpg.add_plot_axis(dpg.mvYAxis, label="Thrust (N)", tag="saved_yax")
                 dpg.add_line_series([], [], label="", tag="saved_series", parent="saved_yax")
+                dpg.add_scatter_series([], [], label="Points", tag="saved_scatter", parent="saved_yax", show=False)
+
+        # ── Saved-view time filter ────────────────────────────────────────────
+        with dpg.group(horizontal=True):
+            dpg.add_spacer(width=630)
+            dpg.add_text("View range (s)  From:")
+            dpg.add_input_float(
+                tag="inp_view_from",
+                default_value=0.0,
+                width=90,
+                format="%.2f",
+                step=0,
+            )
+            dpg.add_text(" To:")
+            dpg.add_input_float(
+                tag="inp_view_to",
+                default_value=60.0,
+                width=90,
+                format="%.2f",
+                step=0,
+            )
+            dpg.add_button(label="Apply", callback=_apply_view_filter)
+            dpg.add_button(label="Reset", callback=_reset_view_filter)
+            dpg.add_spacer(width=12)
+            dpg.add_checkbox(
+                label="Show points",
+                tag="chk_show_points",
+                default_value=False,
+                callback=cb_toggle_points,
+            )
 
         dpg.add_separator()
 
